@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventory Manager</title>
+</head>
+<body>
+
+<h1>Airplane Inventory</h1>
+
+{% for model in data %}
+    <h2>{{ model.model }}</h2>
+
+    <table border="1">
+        <tr>
+            <th>System</th>
+            <th>Available</th>
+            <th>Gross</th>
+            <th>Net Required</th>
+        </tr>
+
+        {% for system, values in model.systems.items() %}
+        {% if system != "peripheral-systems" %}
+        <tr>
+            <td>{{ system }}</td>
+            <td>{{ values.available }}</td>
+            <td>{{ values.gross }}</td>
+            <td>{{ values['net-req'] }}</td>
+        </tr>
+
+        <tr>
+            <td colspan="4">
+                <form action="/update" method="post">
+                    <input type="hidden" name="model" value="{{ model.model }}">
+                    <input type="hidden" name="system" value="{{ system }}">
+
+                    New Available: <input name="available">
+                    New Gross: <input name="gross">
+
+                    <button>Update</button>
+                </form>
+            </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+
+{% endfor %}
+
+</body>
+</html>

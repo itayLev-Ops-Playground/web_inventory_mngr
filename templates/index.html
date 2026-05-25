@@ -25,21 +25,23 @@
     <h2 class="mb-4">Inventory Dashboard</h2>
 
     <div class="row mb-4">
-
-    <!-- ADD MODEL -->
-    <div class="col-md-6">
-            <input class="form-control" name="model" placeholder="New airplane model">
-            <button class="btn btn-primary mt-2 w-100">Add Model</button>
-        </form>
+        <!-- COMMIT -->
+        <div>
+            <form action="/commit" method="GET">
+                <button class="btn btn-success w-100 mt-4">✅ Commit Changes to Database</button>
+            </form>
+        </div>
     </div>
+    <div class="card mb-4 shadow-sm">
+        <!-- ADD MODEL -->
+        <div >
+            <form action="/add_model" method="POST">
+                <input class="form-control" name="model" placeholder="New airplane model">
+                <button class="btn btn-primary mt-2 w-100">Add Model</button>
+            </form>
+        </div>
 
-    <!-- COMMIT -->
-    <div class="col-md-6">
-            <button class="btn btn-success w-100 mt-4">✅ Commit Changes to Database</button>
-        </form>
     </div>
-
-</div>
 
     {% for model in data %}
     <div class="card mb-4 shadow-sm">

@@ -3,8 +3,8 @@
 
 import json
 
-DUMMY_DATA_PATH = "./dummy_data.json"
-DATA_BASE_PATH = "./data_base.json"
+DUMMY_DATA_PATH = "/mnt/efs/dummy_data.json"
+DATA_BASE_PATH = "/mnt/efs/data_base.json"
 
 ### Data helpers ###
 def get_dummy_data():

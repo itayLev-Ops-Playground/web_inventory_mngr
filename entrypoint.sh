@@ -8,22 +8,19 @@ mkdir -p /data
 chown -R www-data:www-data /var/www/inv-web-mngr /data
 chmod -R 755 /var/www/inv-web-mngr
 
-# Attempt to download dummy data from S3 if not already present
-if [ ! -f /data/dummy_data.json ] || [ ! -f /data/data_base.json ]; then
-  echo "[entrypoint] Data files not found in /data. Attempting S3 download..."
-  
-  if [ -n "${S3_BUCKET:-}" ]; then
-    echo "[entrypoint] Downloading from S3 bucket: ${S3_BUCKET}"
-    aws s3 cp "${S3_BUCKET}/dummy_data.json" /data/dummy_data.json --no-sign-request 2>/dev/null || \
-    aws s3 cp "${S3_BUCKET}/dummy_data.json" /data/dummy_data.json 2>/dev/null || \
-    echo "[entrypoint] WARNING: Failed to download dummy_data.json from S3"
-    
-    aws s3 cp "${S3_BUCKET}/data_base.json" /data/data_base.json --no-sign-request 2>/dev/null || \
-    aws s3 cp "${S3_BUCKET}/data_base.json" /data/data_base.json 2>/dev/null || \
-    echo "[entrypoint] WARNING: Failed to download data_base.json from S3"
-  else
-    echo "[entrypoint] S3_BUCKET not set. Skipping S3 download."
-  fi
+# Download data files from S3 HTTPS URLs if not already present
+if [ ! -f /data/dummy_data.json ]; then
+  echo "[entrypoint] dummy_data.json not found. Attempting download from S3..."
+  curl -fsSL "https://inv-web-mngr-data.s3.us-east-1.amazonaws.com/dummy_data.json" \
+    -o /data/dummy_data.json 2>/dev/null || \
+    echo "[entrypoint] WARNING: Failed to download dummy_data.json"
+fi
+
+if [ ! -f /data/data_base.json ]; then
+  echo "[entrypoint] data_base.json not found. Attempting download from S3..."
+  curl -fsSL "https://inv-web-mngr-data.s3.us-east-1.amazonaws.com/data_base.json" \
+    -o /data/data_base.json 2>/dev/null || \
+    echo "[entrypoint] WARNING: Failed to download data_base.json"
 fi
 
 # Handle temporary data files if provided (e.g., via COPY in runtime)
@@ -42,6 +39,20 @@ fi
 # Ensure data directory is owned by Apache user
 chown -R www-data:www-data /data
 chmod -R 755 /data
+
+# Verify data files exist (create empty ones if download failed)
+if [ ! -f /data/dummy_data.json ]; then
+  echo "[entrypoint] Creating empty dummy_data.json"
+  echo "[]" > /data/dummy_data.json
+fi
+
+if [ ! -f /data/data_base.json ]; then
+  echo "[entrypoint] Creating empty data_base.json"
+  echo "[]" > /data/data_base.json
+fi
+
+chown www-data:www-data /data/*.json
+chmod 644 /data/*.json
 
 # Set environment variable for the app
 export INVENTORY_DATA_DIR=/data

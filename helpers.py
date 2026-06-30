@@ -2,9 +2,25 @@
 # Includes functions for loading/saving data, displaying options, and getting user input.
 
 import json
+import os
 
-DUMMY_DATA_PATH = "/mnt/efs/dummy_data.json"
-DATA_BASE_PATH = "/mnt/efs/data_base.json"
+DATA_DIR = os.environ.get("INVENTORY_DATA_DIR", os.path.join(os.path.dirname(__file__), "data"))
+os.makedirs(DATA_DIR, exist_ok=True)
+
+DUMMY_DATA_PATH = os.path.join(DATA_DIR, "dummy_data.json")
+DATA_BASE_PATH = os.path.join(DATA_DIR, "data_base.json")
+
+
+def _ensure_data_files():
+    if not os.path.exists(DUMMY_DATA_PATH):
+        with open(DUMMY_DATA_PATH, "w") as dummy_data_file:
+            json.dump([], dummy_data_file)
+    if not os.path.exists(DATA_BASE_PATH):
+        with open(DATA_BASE_PATH, "w") as data_base_file:
+            json.dump([], data_base_file)
+
+
+_ensure_data_files()
 
 ### Data helpers ###
 def get_dummy_data():
